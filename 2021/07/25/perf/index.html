@@ -14,7 +14,7 @@
 <meta property="og:description" content="perf的原理perf listperf list用来显示perf相关的事件有哪些，可以显示perf可以跟踪的事件符号。（这些事件都是可以在下面的命令中通过-e指定的事件） 注：对于非特权用户只支持少量的perf事件，通常只支持上下文切换方面的时间，其中包括少数的CPU的PMU事件和一些软件事件，其余的PMU和软件事件则不支持。（也允许通过sysctl设置kernel.perf_event_par">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-07-25T05:04:52.000Z">
-<meta property="article:modified_time" content="2021-07-25T05:27:36.077Z">
+<meta property="article:modified_time" content="2021-07-25T05:29:23.110Z">
 <meta property="article:author" content="Chengchang Tang">
 <meta name="twitter:card" content="summary">
   
@@ -141,9 +141,9 @@
 <ol>
 <li>采集StackTrace：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ perf record -F 99 -a -g -- sleep 60</span><br></pre></td></tr></table></figure></li>
 <li>将二进制的perf.data数据转化为可读的数据：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ perf script -i perf.data &amp;&gt; perf.unfold</span><br></pre></td></tr></table></figure></li>
-<li>利用FlameGraph的对应脚本，将unfold的数据进行fold，生成统一格式的fold文件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./stackcollapse-perf.pl perf.unfold &amp;&gt; perf.folded</span><br></pre></td></tr></table></figure>
+<li>利用FlameGraph的对应脚本，将unfold的数据进行fold，生成统一格式的fold文件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./stackcollapse-perf.pl perf.unfold &amp;&gt; perf.folded</span><br></pre></td></tr></table></figure>
 （这一步里由于我们使用的是perf，所以利用该脚本进行fold，如果是其他平台其他工具，使用对应工具的脚本就行）</li>
-<li>将folded格式的数据文件转化为火焰图：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./flamegraph.pl perf.folded &gt; perf.svg</span><br></pre></td></tr></table></figure></li>
+<li>将folded格式的数据文件转化为火焰图：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./flamegraph.pl perf.folded &gt; perf.svg</span><br></pre></td></tr></table></figure></li>
 </ol>
 <ul>
 <li>注：perf可以用来分析on-cpu的火焰图，off-cpu的火焰图则需要使用其他的工具了。在本节中就不包括这些了。</li>
