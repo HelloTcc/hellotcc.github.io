@@ -6,15 +6,15 @@
   
   <title>perf使用技巧 | HelloTcc</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="perfperf的原理perf listperf list用来显示perf相关的事件有哪些，可以显示perf可以跟踪的事件符号。（这些事件都是可以在下面的命令中通过-e指定的事件） 注：对于非特权用户只支持少量的perf事件，通常只支持上下文切换方面的时间，其中包括少数的CPU的PMU事件和一些软件事件，其余的PMU和软件事件则不支持。（也允许通过sysctl设置kernel.perf_event">
+  <meta name="description" content="perf使用技巧perf的原理perf listperf list用来显示perf相关的事件有哪些，可以显示perf可以跟踪的事件符号。（这些事件都是可以在下面的命令中通过-e指定的事件） 注：对于非特权用户只支持少量的perf事件，通常只支持上下文切换方面的时间，其中包括少数的CPU的PMU事件和一些软件事件，其余的PMU和软件事件则不支持。（也允许通过sysctl设置kernel.perf_e">
 <meta property="og:type" content="article">
 <meta property="og:title" content="perf使用技巧">
 <meta property="og:url" content="https://hellotcc.github.io/2021/07/25/perf/index.html">
 <meta property="og:site_name" content="HelloTcc">
-<meta property="og:description" content="perfperf的原理perf listperf list用来显示perf相关的事件有哪些，可以显示perf可以跟踪的事件符号。（这些事件都是可以在下面的命令中通过-e指定的事件） 注：对于非特权用户只支持少量的perf事件，通常只支持上下文切换方面的时间，其中包括少数的CPU的PMU事件和一些软件事件，其余的PMU和软件事件则不支持。（也允许通过sysctl设置kernel.perf_event">
+<meta property="og:description" content="perf使用技巧perf的原理perf listperf list用来显示perf相关的事件有哪些，可以显示perf可以跟踪的事件符号。（这些事件都是可以在下面的命令中通过-e指定的事件） 注：对于非特权用户只支持少量的perf事件，通常只支持上下文切换方面的时间，其中包括少数的CPU的PMU事件和一些软件事件，其余的PMU和软件事件则不支持。（也允许通过sysctl设置kernel.perf_e">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-07-25T05:04:52.000Z">
-<meta property="article:modified_time" content="2021-07-25T05:20:44.555Z">
+<meta property="article:modified_time" content="2021-07-25T05:23:31.264Z">
 <meta property="article:author" content="Chengchang Tang">
 <meta name="twitter:card" content="summary">
   
@@ -95,7 +95,7 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="perf"><a href="#perf" class="headerlink" title="perf"></a><center>perf</h1><h2 id="perf的原理"><a href="#perf的原理" class="headerlink" title="perf的原理"></a>perf的原理</h2><h2 id="perf-list"><a href="#perf-list" class="headerlink" title="perf list"></a>perf list</h2><p>perf list用来显示perf相关的事件有哪些，可以显示perf可以跟踪的事件符号。（这些事件都是可以在下面的命令中通过-e指定的事件）</p>
+        <h1 id="perf使用技巧"><a href="#perf使用技巧" class="headerlink" title="perf使用技巧"></a><center>perf使用技巧</h1><h2 id="perf的原理"><a href="#perf的原理" class="headerlink" title="perf的原理"></a>perf的原理</h2><h2 id="perf-list"><a href="#perf-list" class="headerlink" title="perf list"></a>perf list</h2><p>perf list用来显示perf相关的事件有哪些，可以显示perf可以跟踪的事件符号。（这些事件都是可以在下面的命令中通过-e指定的事件）</p>
 <p>注：对于非特权用户只支持少量的perf事件，通常只支持上下文切换方面的时间，其中包括少数的CPU的PMU事件和一些软件事件，其余的PMU和软件事件则不支持。（也允许通过sysctl设置kernel.perf_event_paranoid为-1，来为非root用户提权）</p>
 <h2 id="perf-top"><a href="#perf-top" class="headerlink" title="perf top"></a>perf top</h2><p>perf top的功能类似</p>
 <h2 id="perf-stat"><a href="#perf-stat" class="headerlink" title="perf stat"></a>perf stat</h2><p>perf stat是获取性能counter统计数据的工具。其中的counter类型就是perf list中包含的event，其中包括硬件统计（PMU，performance monitor unit）也包括软件trace event（可以在ftrace系统中找到相关的信息和实现）的统计。</p>
@@ -139,7 +139,7 @@
 <p>git clone <a target="_blank" rel="noopener" href="https://github.com/brendangregg/FlameGraph.git">https://github.com/brendangregg/FlameGraph.git</a></p>
 <p>在FlameGraph的仓下会有很多脚本，这里我们只需要重点关注<code>flamegraph.pl</code>和<code>stackcollapse-xxx.pl</code>就行了，通常的使用步骤如下：</p>
 <ol>
-<li>采集StackTrace：<br><code>perf record -F 99 -a -g -- sleep 60</code></li>
+<li>采集StackTrace：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ perf record -F 99 -a -g -- sleep 60</span><br></pre></td></tr></table></figure></li>
 <li>将二进制的perf.data数据转化为可读的数据：<br><code>perf script -i perf.data &amp;&gt; perf.unfold</code></li>
 <li>利用FlameGraph的对应脚本，将unfold的数据进行fold，生成统一格式的fold文件：<br><code>./stackcollapse-perf.pl perf.unfold &amp;&gt; perf.folded</code><br>（这一步里由于我们使用的是perf，所以利用该脚本进行fold，如果是其他平台其他工具，使用对应工具的脚本就行）</li>
 <li>将folded格式的数据文件转化为火焰图：<br><code>./flamegraph.pl perf.folded &gt; perf.svg</code></li>
