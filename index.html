@@ -123,7 +123,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://hellotcc.github.io/2021/07/25/dns-setup/" data-id="cla9v10pe0000p4tie1c673nw" data-title="linux dns setup" class="article-share-link">Share</a>
+      <a data-url="https://hellotcc.github.io/2021/07/25/dns-setup/" data-id="cla9vkkd50000vtti788wdwhv" data-title="linux dns setup" class="article-share-link">Share</a>
       
       
       
@@ -161,7 +161,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://hellotcc.github.io/2021/07/25/ftrace/" data-id="cla9v10ph0001p4tieleagx8b" data-title="ftrace" class="article-share-link">Share</a>
+      <a data-url="https://hellotcc.github.io/2021/07/25/ftrace/" data-id="cla9vkkd80001vtti9guo7hl0" data-title="ftrace" class="article-share-link">Share</a>
       
       
       
@@ -239,11 +239,20 @@
 <p>git clone <a target="_blank" rel="noopener" href="https://github.com/brendangregg/FlameGraph.git">https://github.com/brendangregg/FlameGraph.git</a></p>
 <p>在FlameGraph的仓下会有很多脚本，这里我们只需要重点关注<code>flamegraph.pl</code>和<code>stackcollapse-xxx.pl</code>就行了，通常的使用步骤如下：</p>
 <ol>
-<li>采集StackTrace：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ perf record -F 99 -a -g -- <span class="built_in">sleep</span> 60</span><br></pre></td></tr></table></figure></li>
-<li>将二进制的perf.data数据转化为可读的数据：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ perf script -i perf.data &amp;&gt; perf.unfold</span><br></pre></td></tr></table></figure></li>
-<li>利用FlameGraph的对应脚本，将unfold的数据进行fold，生成统一格式的fold文件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./stackcollapse-perf.pl perf.unfold &amp;&gt; perf.folded</span><br></pre></td></tr></table></figure>
-（这一步里由于我们使用的是perf，所以利用该脚本进行fold，如果是其他平台其他工具，使用对应工具的脚本就行）</li>
-<li>将folded格式的数据文件转化为火焰图：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./flamegraph.pl perf.folded &gt; perf.svg</span><br></pre></td></tr></table></figure></li>
+<li><p>采集StackTrace：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ perf record -F 99 -a -g -- <span class="built_in">sleep</span> 60</span><br></pre></td></tr></table></figure>
+<p>其中F可以直接使用max指定最大频率，但是通常会导致数据量过大。</p>
+</li>
+<li><p>将二进制的perf.data数据转化为可读的数据：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ perf script -i perf.data &amp;&gt; perf.unfold</span><br></pre></td></tr></table></figure>
+<p>务必保证是在同一个perf下进行转换，不同版本之间可能存在兼容性问题。</p>
+</li>
+<li><p>利用FlameGraph的对应脚本，将unfold的数据进行fold，生成统一格式的fold文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./stackcollapse-perf.pl perf.unfold &amp;&gt; perf.folded</span><br></pre></td></tr></table></figure>
+<p>（这一步里由于我们使用的是perf，所以利用该脚本进行fold，如果是其他平台其他工具，使用对应工具的脚本就行）</p>
+</li>
+<li><p>将folded格式的数据文件转化为火焰图：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./flamegraph.pl perf.folded &gt; perf.svg</span><br></pre></td></tr></table></figure></li>
 </ol>
 <ul>
 <li>注：perf可以用来分析on-cpu的火焰图，off-cpu的火焰图则需要使用其他的工具了。在本节中就不包括这些了。</li>
@@ -258,7 +267,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://hellotcc.github.io/2021/07/25/perf/" data-id="cla9v10pi0002p4tidh65c6dd" data-title="perf" class="article-share-link">Share</a>
+      <a data-url="https://hellotcc.github.io/2021/07/25/perf/" data-id="cla9vkkd90002vtti7zb5gh3e" data-title="perf" class="article-share-link">Share</a>
       
       
       
