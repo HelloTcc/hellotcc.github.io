@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>HelloTcc</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="show me the note">
+<meta property="og:type" content="website">
+<meta property="og:title" content="HelloTcc">
+<meta property="og:url" content="https://hellotcc.github.io/index.html">
+<meta property="og:site_name" content="HelloTcc">
+<meta property="og:description" content="show me the note">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="Chengchang Tang">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="HelloTcc" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">HelloTcc</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://hellotcc.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-dns-setup" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/07/25/dns-setup/" class="article-date">
+  <time class="dt-published" datetime="2021-07-25T05:32:02.000Z" itemprop="datePublished">2021-07-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/07/25/dns-setup/">linux dns setup</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>这个文档是用来记录日常使用linux冲浪时遇到的与DNS相关的一些问题，以及一些相关的小技巧</p>
+<h2 id="修改DNS的坑"><a href="#修改DNS的坑" class="headerlink" title="修改DNS的坑"></a>修改DNS的坑</h2><p>在使用ubuntu 18.04的时候，想要上下github，但是因为众所周之的原因，就很慢，甚至github.io根本就没法连接。于是想要通过修改dns和host的方式来加快一下浏览的速度（主要原因是不想去折腾科学上网）。但是，修改hosts文件根本无法生效，修改DNS也会在重启之后实效。于是不得已折腾了小半天这个DNS的设置。</p>
+<p>在ubuntu（18）中，系统默认开启了systemd的resolved（后文对resolved有相关介绍），因此会默认将DNS设置为127.0.0.53，通常我们使用时，都只修改&#x2F;etc&#x2F;resolv.conf和network-script里面的dns的设置，这这种修改仅仅只会使得DNS的修改生效一段时间，在重启网络或者重启系统后，resolv.conf的设置就会又被resolved改回去。</p>
+<p>所以正确的打开方式是：</p>
+<ul>
+<li>修改&#x2F;etc&#x2F;systemd&#x2F;resolved.conf,里面有DNS以及fallbackDNS的设置，无论设置哪个都可以起到效果，不过建议修改fallback DNS，将我们需要添加的DNS放入fallback DNS中就可以了。以免修改了DNS影响resolved的功能（让resolved决定默认的DNS）。</li>
+<li>修改&#x2F;etc&#x2F;hosts，这个时候可以修改&#x2F;etc&#x2F;hosts了，将我们需要加速的网站写入&#x2F;etc&#x2F;hosts中</li>
+<li>对于一些启用了nscd的机器，可能还需要刷新一下DNS的缓存: systemctl restart nscd（service也行，系统用啥管理就用啥重启服务）</li>
+</ul>
+<h2 id="resolved和resolvectl"><a href="#resolved和resolvectl" class="headerlink" title="resolved和resolvectl"></a>resolved和resolvectl</h2><p>resolved是systemd的一部分，它为系统提供了DNS缓存还有LLMNR以及multicastDNS的功能。（实际上有很多商用OS并不会启用它，因此很多系统需要其他的DNS缓存服务例如nscd）。</p>
+<p>在使用resolved时，resolvectl就是与resolved配套使用的工具，可以用来在线设置查询相关的DNS服务。</p>
+<ul>
+<li>resolvectl status：查看当前resolved的状态，包括当前DNS运行的状态(这是目前指导的唯一的有效的方法查看当前DNS的手段)</li>
+<li>resolvectl statistics:查看那当前的统计信息</li>
+<li>resolvectl dns enp3s0 114.114.114.114手动设置DNS服务</li>
+<li>resolvectl query <a href="https://hellotcc.github.io/">https://hellotcc.github.io</a> 查看当前的网站的DNS查询结果</li>
+</ul>
+<h2 id="nscd"><a href="#nscd" class="headerlink" title="nscd"></a>nscd</h2><p>与win不一样，默认linux下没有DNS缓存机制，需要自行添加相关的服务nscd，当然nscd也不仅仅提供DNS的缓存能力，还提供了passwd, groups，hosts, netgroup等功能的缓存服务</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li>man resovld.conf</li>
+<li>man systemd-resolved.service</li>
+<li>man nscd</li>
+<li>man resolvectl</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://hellotcc.github.io/2021/07/25/dns-setup/" data-id="cla9uzhlc0000nyti9yykbm99" data-title="linux dns setup" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-ftrace" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/07/25/ftrace/" class="article-date">
+  <time class="dt-published" datetime="2021-07-25T05:31:35.000Z" itemprop="datePublished">2021-07-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/07/25/ftrace/">ftrace</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://hellotcc.github.io/2021/07/25/ftrace/" data-id="cla9uzhlf0001nytifxs3ea05" data-title="ftrace" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-perf" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/07/25/perf/" class="article-date">
+  <time class="dt-published" datetime="2021-07-25T05:04:52.000Z" itemprop="datePublished">2021-07-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/07/25/perf/">perf</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="perf的原理"><a href="#perf的原理" class="headerlink" title="perf的原理"></a>perf的原理</h2><h2 id="perf-list"><a href="#perf-list" class="headerlink" title="perf list"></a>perf list</h2><p>perf list用来显示perf相关的事件有哪些，可以显示perf可以跟踪的事件符号。（这些事件都是可以在下面的命令中通过-e指定的事件）</p>
+<p>注：对于非特权用户只支持少量的perf事件，通常只支持上下文切换方面的时间，其中包括少数的CPU的PMU事件和一些软件事件，其余的PMU和软件事件则不支持。（也允许通过sysctl设置kernel.perf_event_paranoid为-1，来为非root用户提权）</p>
+<h2 id="perf-top"><a href="#perf-top" class="headerlink" title="perf top"></a>perf top</h2><p>perf top的功能类似</p>
+<h2 id="perf-stat"><a href="#perf-stat" class="headerlink" title="perf stat"></a>perf stat</h2><p>perf stat是获取性能counter统计数据的工具。其中的counter类型就是perf list中包含的event，其中包括硬件统计（PMU，performance monitor unit）也包括软件trace event（可以在ftrace系统中找到相关的信息和实现）的统计。</p>
+<p>通常在对一个系统进行评估时，我们会定义一些指标，perf stat可以帮助我们从系统中获取原始的数据，我们可以通过计算来获得我们需要的这些指标的值，最终实现对一个“系统”的评估。</p>
+<p>常用的参数：</p>
+<ul>
+<li>-e，指定event，相关event可以通过上述的perf list获取</li>
+<li>-p，指定需要profiling的进程的pid，多个pid之间通过逗号分割</li>
+</ul>
+<h3 id="topdown"><a href="#topdown" class="headerlink" title="topdown"></a>topdown</h3><p>Topdown本身是一种由IBM提出来的方法论，常本用于电子行业的设计领域。我们这里说的Topdown通常指的是针对CPU的微架构分析方法Top-down Microarchitecutre Analysis Method（a.k.a TMAM）。</p>
+<p>TMAM将Topdown作为一种方法论，引入到了当前CPU的流水线运行瓶颈的分析之中，将流水线的模型抽象成了四个部分（front-end bound,back-end bound, bad speculation和retiring）。这样一个抽象模型为用户打开了一个统一的全局视角，实现了跨架构的分析方法。同时也去掉了大量不必要的细节，减少用户的学习成本（因为传统的分析方法，对于用户来说需要大量的cpu架构相关的知识，这个学习成本极高，并且用来分析的数据成千上万，无法直接使用，TMAM在这里定义了一些重要的性能指标）。通过典型的指标分析到软件相应的瓶颈后，用户可以通过针对性的优化手段来提高软件在当前CPU微架构下的性能。</p>
+<p>支持TMAM的工具有不少，包括intel的Vtune和perf stat。当然要支持TMAM也依赖与驱动和硬件本身，intel 是在sandy bridge之后加入了对TMAM的支持，arm架构则更加混乱一些，虽然定义了标准的事件，但是最终还是依赖各个厂商的实现情况，如果相关产家没有实现标准的一些PMU事件，则可能需要通过一些其他的方法来支持TMAM的分析了（这些非标的设计可能提高了分析的精度、提供了更多的信息或者降低了硬件的成本，但是不得不说，这都是在提高用户的学习成本）。</p>
+<p>这里简单总结一下TMAM中各个环节的特点：</p>
+<ol>
+<li><p>front-end<br>Front end包括下一条指令地址的预测、取指、译码、微码的转换这些内容。也就是cpu执行的最前端，通常有两个指标fetch latency和fetch bandwidth。</p>
+<p>Fetch latency指没有指令被发射的周期。导致这个问题主要有icache和iTLB的miss，除此之外还有一项，即分支预测导致的再次取指的过程(branch resteers)被当作fetch delay计算到了front end中。(PS:分支预测导致的pipeline flush的部分则是被算到了bad speculation的Machine clear中，即这两项存在一定的耦合关系)</p>
+<p>Fecth bandwidth指发射不满的周期，比如可以四发射的cpu，不满四发射的周期的数量。它可能指向了译码效率低的问题。</p>
+<p>整体来看front end成为瓶颈点的可能性比较小，但是也不是不可能的，比如在解释性语言中分支预测的效率可能比较低，这一类的优化可能需要从编译器或者解释器入手。（这里体现出了c等编译型语言的性能优势点之一了，可以获得更好的BP效果）</p>
+</li>
+<li><p>back-end<br>back-end负责指令的发射，它会监控当前微码所需的数据是否准备完毕，是否满足发射条件，并根据实际情况将微码发射到发射队列中（这个过程被称为allocate）。因此backend统计通常反映了指令未能有效的发射出去的问题（现在的cpu通常都支持多发射，有多个将微码发送到执行单元的队列，backend反映的就是这些发射队列中的气泡的问题）。最常见的导致这类问题的原因就是Data cache miss。通常backend根据问题的原因又可以分为：Memory bound 和 core bound。</p>
+<p>Memory bound的问题是最常见的，指的是由于内存子系统或者cache引入的cpu stall。该类别问题的子项很多，例如各个level的cache miss，由于内存序导致的回写，甚至也有可能并没有发生cache miss而是由于cache的一致性（同步）引入了延迟从而导致了stall（这个场景下，一个数据存在多个cache中，由于需要确定数据的合法性，相比与没有这个过程来说增加了一定的延迟）。 这种问题</p>
+<p>Core bound的问题通常比较难以界定的，通常是由于执行单元的限制（多个指令需要同一个执行单元执行,即计算资源不足够）或者代码的并行度不够造成的（这里指的并不是通常意义的并行执行，而是指代码前后之间存在依赖关系，无法实现乱序执行）。这一类的问题通常也没法在代码中进行优化，需要优化cpu的设计或者是优化编译。</p>
+</li>
+</ol>
+<ul>
+<li>分割线（通常把上面两种称为前段，后面两种称为后端）</li>
+</ul>
+<ol start="3">
+<li><p>bad speculation<br>bad speculation主要指由于错误的投机执行导致的pipeline slot的浪费，其中包括了在执行单元中被丢弃从而未能retire的指令（微码）以及由早期错误的投机执行导致的recovery操作引发的发射队列阻塞导致的slot浪费。<br>大体上bad speculation又被分为了两类，branch mispredict和Machine clear。其中branch mispredict包括分支预测还有错误的投机读。然而由于分支预测导致的pipeline flush的部分则被算到了Machine clear中，除此之外中断异常等引发的pipeline flush也都是Machine clear的一部分。</p>
+</li>
+<li><p>retiring<br>retiring就是最终成功执行的指令，代码优化的最终目的就是提高该项指标，如果是100%则说明代码已经没有进一步优化的空间了</p>
+</li>
+</ol>
+<p>下面的连接是VTune中使用Topdown的分析方法，可以作为参考：<br><a target="_blank" rel="noopener" href="https://software.intel.com/content/www/us/en/develop/documentation/vtune-cookbook/top/methodologies/top-down-microarchitecture-analysis-method.html">https://software.intel.com/content/www/us/en/develop/documentation/vtune-cookbook/top/methodologies/top-down-microarchitecture-analysis-method.html</a></p>
+<p>附：IA64的优化手册<br><a target="_blank" rel="noopener" href="https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-optimization-manual.pdf">https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-optimization-manual.pdf</a></p>
+<h3 id="perf-stat使用实例"><a href="#perf-stat使用实例" class="headerlink" title="perf stat使用实例"></a>perf stat使用实例</h3><h2 id="perf-trace"><a href="#perf-trace" class="headerlink" title="perf trace"></a>perf trace</h2><p>perf trace可以用来</p>
+<h2 id="perf-record"><a href="#perf-record" class="headerlink" title="perf record"></a>perf record</h2><p>perf record可以记录一段时间内的事件数据，甚至包括stacktrace信息。可以用来帮助分析“系统”的调用栈。</p>
+<h3 id="火焰图的使用方法"><a href="#火焰图的使用方法" class="headerlink" title="火焰图的使用方法"></a>火焰图的使用方法</h3><p>火焰图（FlameGraph）是对调用栈信息的可视化分析手段，可以帮助使用者快速找到“系统”的性能瓶颈。</p>
+<p>FlameGraph设计了前后端的分离，中间层使用了统一的数据格式，因此其可以支持多种stacktrace工具。对于linux来说，最常见的就是perf。由于需要生成调用栈的信息，因此通常使用perf record -g（call-graph）来采集stacktrace的信息，并保存为二进制信息，然后再利用perf script生成human readable的unfold文件，最终通过FlameGraph的perl脚本对这些可读的数据进行处理生成火焰图。</p>
+<p>火焰图的生成工具可以通过以下方式下载：</p>
+<p>git clone <a target="_blank" rel="noopener" href="https://github.com/brendangregg/FlameGraph.git">https://github.com/brendangregg/FlameGraph.git</a></p>
+<p>在FlameGraph的仓下会有很多脚本，这里我们只需要重点关注<code>flamegraph.pl</code>和<code>stackcollapse-xxx.pl</code>就行了，通常的使用步骤如下：</p>
+<ol>
+<li>采集StackTrace：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ perf record -F 99 -a -g -- <span class="built_in">sleep</span> 60</span><br></pre></td></tr></table></figure></li>
+<li>将二进制的perf.data数据转化为可读的数据：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ perf script -i perf.data &amp;&gt; perf.unfold</span><br></pre></td></tr></table></figure></li>
+<li>利用FlameGraph的对应脚本，将unfold的数据进行fold，生成统一格式的fold文件：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./stackcollapse-perf.pl perf.unfold &amp;&gt; perf.folded</span><br></pre></td></tr></table></figure>
+（这一步里由于我们使用的是perf，所以利用该脚本进行fold，如果是其他平台其他工具，使用对应工具的脚本就行）</li>
+<li>将folded格式的数据文件转化为火焰图：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./flamegraph.pl perf.folded &gt; perf.svg</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li>注：perf可以用来分析on-cpu的火焰图，off-cpu的火焰图则需要使用其他的工具了。在本节中就不包括这些了。</li>
+</ul>
+<h2 id="perf-report"><a href="#perf-report" class="headerlink" title="perf report"></a>perf report</h2><p>perf report也是一种profiling数据可视化的手段,可以看作是静态的perf top。</p>
+<p>常用参数：</p>
+<ul>
+<li>-i，指定输入文件，如果没有制定则默认是perf.data。</li>
+</ul>
+<h2 id="perf-probe"><a href="#perf-probe" class="headerlink" title="perf probe"></a>perf probe</h2><h2 id="perf-annotate"><a href="#perf-annotate" class="headerlink" title="perf annotate"></a>perf annotate</h2><h2 id="perf-c2c"><a href="#perf-c2c" class="headerlink" title="perf c2c"></a>perf c2c</h2><p>perf c2c是用来研究</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://hellotcc.github.io/2021/07/25/perf/" data-id="cla9uzhlg0002nyti69r78e61" data-title="perf" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">July 2021</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2021/07/25/dns-setup/">linux dns setup</a>
+          </li>
+        
+          <li>
+            <a href="/2021/07/25/ftrace/">ftrace</a>
+          </li>
+        
+          <li>
+            <a href="/2021/07/25/perf/">perf</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2022 Chengchang Tang<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
